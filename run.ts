@@ -1,9 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { generateWithGoogle } from './providers/google.js';
-import { generateWithKling } from './providers/kling.js';
-import { generateWithVidu } from './providers/vidu.js';
-import { generateWithCapCut } from './providers/capcut.js';
+import { generateVideo } from './helpers.js';
 
 const outputDir = path.join(process.cwd(), 'output');
 const logFile = path.join(outputDir, 'run.log');
@@ -25,36 +22,17 @@ async function main() {
   log('Prompt:', prompt);
   log('Output directory:', outputDir);
 
-  const providers = [
-    { name: 'google', fn: generateWithGoogle },
-    { name: 'kling', fn: generateWithKling },
-    { name: 'vidu', fn: generateWithVidu },
-    { name: 'capcut', fn: generateWithCapCut },
-  ];
+  try {
+    log('Calling generateVideo...');
+    const videoPath = await generateVideo(prompt, outputDir);
 
-  let success = false;
-
-  for (const provider of providers) {
-    try {
-      log('');
-      log('Trying ' + provider.name + '...');
-
-      const videoPath = await provider.fn(prompt, outputDir);
-
-      if (videoPath && fs.existsSync(videoPath)) {
-        log('✅ Generated with: ' + provider.name + ' → ' + videoPath);
-        success = true;
-        break;
-      } else {
-        log('❌ ' + provider.name + ' returned no video');
-      }
-    } catch (err) {
-      log('❌ Error with ' + provider.name + ': ' + (err as Error).message);
+    if (videoPath && fs.existsSync(videoPath)) {
+      log('✅ Generated video: ' + videoPath);
+    } else {
+      log('❌ generateVideo returned no video path');
     }
-  }
-
-  if (!success) {
-    log('❌ All providers failed or were skipped');
+  } catch (err) {
+    log('❌ Error in generateVideo: ' + (err as Error).message);
   }
 
   // Write log file
