@@ -4,9 +4,9 @@ on:
   workflow_dispatch:
     inputs:
       prompt:
-        description: "Video prompt"
+        description: 'Video prompt'
         required: true
-        default: "A cinematic shot of a man walking through a desert at sunset, warm lighting, slow motion"
+        default: 'A cinematic shot of a man walking through a desert at sunset, warm lighting, slow motion'
 
 jobs:
   generate:
@@ -19,8 +19,8 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
-          cache: "npm"
+          node-version: '20'
+          cache: 'npm'
 
       - name: Install dependencies
         run: |
