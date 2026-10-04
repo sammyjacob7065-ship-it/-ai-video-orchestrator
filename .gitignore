@@ -1,0 +1,7 @@
+node_modules/
+dist/
+output/
+credit-state.json
+.env
+*.log
+.DS_Store
