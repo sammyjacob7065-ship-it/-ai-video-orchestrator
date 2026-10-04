@@ -1,4 +1,3 @@
-import { test } from '@playwright/test';
 import { shortDelay, mediumDelay, longDelay } from '../lib/humanDelays';
 
 export async function generateWithVidu(prompt: string): Promise<string> {
@@ -50,10 +49,3 @@ export async function generateWithVidu(prompt: string): Promise<string> {
     await browser.close();
   }
 }
-
-// Manual test for later
-test('manual vidu generation', async ({ page }) => {
-  const prompt = "A cinematic shot of a man walking through a desert at sunset, warm lighting, slow motion";
-  const path = await generateWithVidu(prompt);
-  console.log('Generated video:', path);
-});
