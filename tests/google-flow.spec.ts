@@ -1,11 +1,8 @@
-import { test, expect } from '@playwright/test';
 import { shortDelay, mediumDelay, longDelay } from '../lib/humanDelays';
 
-// This function will be imported by generateVideo.ts later.
 export async function generateWithGoogleFlow(prompt: string): Promise<string> {
   const { chromium } = require('playwright');
 
-  // We'll configure headless/headed and storageState from env later.
   const browser = await chromium.launch({ headless: false });
   const context = await browser.newContext({
     storageState: process.env.GOOGLE_STORAGE_STATE || undefined,
@@ -17,7 +14,7 @@ export async function generateWithGoogleFlow(prompt: string): Promise<string> {
     await page.goto('https://docs.google.com/vids', { waitUntil: 'domcontentloaded' });
     await mediumDelay();
 
-    // TODO: Add login handling here if needed (or rely on saved storageState).
+    // TODO: Handle login handling here if needed (or rely on saved storageState).
 
     // 2. Click "Create AI videos"
     // Selector may need adjustment once we test in browser.
@@ -55,10 +52,3 @@ export async function generateWithGoogleFlow(prompt: string): Promise<string> {
     await browser.close();
   }
 }
-
-// A simple Playwright test you can run later to manually verify flow.
-test('manual google flow generation', async ({ page }) => {
-  const prompt = "A cinematic shot of a man walking through a desert at sunset, warm lighting, slow motion";
-  const path = await generateWithGoogleFlow(prompt);
-  console.log('Generated video:', path);
-});
