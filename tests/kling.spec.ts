@@ -1,4 +1,3 @@
-import { test } from '@playwright/test';
 import { shortDelay, mediumDelay, longDelay } from '../lib/humanDelays';
 
 export async function generateWithKling(prompt: string): Promise<string> {
@@ -11,14 +10,13 @@ export async function generateWithKling(prompt: string): Promise<string> {
   const page = await context.newPage();
 
   try {
-    // 1. Open Kling AI (adjust URL if your account uses a different entry)
+    // 1. Open Kling AI
     await page.goto('https://kling.ai/', { waitUntil: 'domcontentloaded' });
     await mediumDelay();
 
     // TODO: Handle login if not using saved storageState.
 
     // 2. Navigate to text-to-video or image-to-video section
-    // This selector will be refined once we test in browser.
     await page.click('a:has-text("AI Video"), button:has-text("AI Video"), [href*="video"]');
     await mediumDelay();
 
@@ -51,10 +49,3 @@ export async function generateWithKling(prompt: string): Promise<string> {
     await browser.close();
   }
 }
-
-// Manual test for later
-test('manual kling generation', async ({ page }) => {
-  const prompt = "A cinematic shot of a man walking through a desert at sunset, warm lighting, slow motion";
-  const path = await generateWithKling(prompt);
-  console.log('Generated video:', path);
-});
