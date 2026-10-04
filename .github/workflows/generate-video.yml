@@ -28,6 +28,8 @@ jobs:
           npx playwright install chromium --with-deps
 
       - name: Run video generator
+        env:
+          INPUT_PROMPT: ${{ github.event.inputs.prompt }}
         run: npm run run
 
       - name: Upload generated videos and log
