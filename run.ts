@@ -1,27 +1,67 @@
-import { generateVideo, setProviders } from './lib/generateVideo';
-import { generateWithGoogleFlow } from './tests/google-flow.spec';
-import { generateWithKling } from './tests/kling.spec';
-import { generateWithVidu } from './tests/vidu.spec';
-import { generateWithCapCut } from './tests/capcut.spec';
+import * as fs from 'fs';
+import * as path from 'path';
+import { generateWithGoogle } from './providers/google.js';
+import { generateWithKling } from './providers/kling.js';
+import { generateWithVidu } from './providers/vidu.js';
+import { generateWithCapCut } from './providers/capcut.js';
 
-// Wire up the provider functions
-setProviders({
-  google: generateWithGoogleFlow,
-  kling: generateWithKling,
-  vidu: generateWithVidu,
-  capcut: generateWithCapCut,
-});
+const outputDir = path.join(process.cwd(), 'output');
+const logFile = path.join(outputDir, 'run.log');
+const logLines: string[] = [];
 
-async function main() {
-  const prompt =
-    "A cinematic shot of a man walking through a desert at sunset, warm lighting, slow motion";
-
-  try {
-    const result = await generateVideo(prompt, { preferProvider: 'google' });
-    console.log('✅ Generated with:', result.provider, '→', result.path);
-  } catch (err) {
-    console.error('❌ All providers failed:', err);
-  }
+function log(msg: string) {
+  logLines.push(msg);
+  console.log(msg);
 }
 
-main().catch(console.error);
+async function main() {
+  fs.mkdirSync(outputDir, { recursive: true });
+
+  const prompt =
+    process.env.INPUT_PROMPT ||
+    'A cinematic shot of a man walking through a desert at sunset, warm lighting, slow motion';
+
+  log('Running video generator script...');
+  log('Prompt:', prompt);
+  log('Output directory:', outputDir);
+
+  const providers = [
+    { name: 'google', fn: generateWithGoogle },
+    { name: 'kling', fn: generateWithKling },
+    { name: 'vidu', fn: generateWithVidu },
+    { name: 'capcut', fn: generateWithCapCut },
+  ];
+
+  let success = false;
+
+  for (const provider of providers) {
+    try {
+      log('');
+      log('Trying ' + provider.name + '...');
+
+      const videoPath = await provider.fn(prompt, outputDir);
+
+      if (videoPath && fs.existsSync(videoPath)) {
+        log('✅ Generated with: ' + provider.name + ' → ' + videoPath);
+        success = true;
+        break;
+      } else {
+        log('❌ ' + provider.name + ' returned no video');
+      }
+    } catch (err) {
+      log('❌ Error with ' + provider.name + ': ' + (err as Error).message);
+    }
+  }
+
+  if (!success) {
+    log('❌ All providers failed or were skipped');
+  }
+
+  // Write log file
+  fs.writeFileSync(logFile, logLines.join('\n'), 'utf-8');
+  log('Log written to: ' + logFile);
+
+  process.exit(0);
+}
+
+main();
