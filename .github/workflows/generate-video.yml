@@ -1,0 +1,42 @@
+name: Generate AI Video
+
+on:
+  workflow_dispatch: # allows manual trigger from GitHub UI
+    inputs:
+      prompt:
+        description: "Video prompt"
+        required: true
+        default: "A cinematic shot of a man walking through a desert at sunset, warm lighting, slow motion"
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "npm"
+
+      - name: Install dependencies
+        run: |
+          npm ci
+          npx playwright install chromium --with-deps
+
+      - name: Run video generator
+        run: |
+          npm run run
+        env:
+          # We'll add secrets (logins, storageState paths) later.
+          # For now, this is just the basic workflow.
+
+      - name: Upload generated videos
+        uses: actions/upload-artifact@v4
+        with:
+          name: generated-videos
+          path: output/
+          if-no-files-found: ignore
