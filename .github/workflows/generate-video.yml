@@ -1,7 +1,7 @@
 name: Generate AI Video
 
 on:
-  workflow_dispatch: # allows manual trigger from GitHub UI
+  workflow_dispatch:
     inputs:
       prompt:
         description: "Video prompt"
@@ -28,11 +28,7 @@ jobs:
           npx playwright install chromium --with-deps
 
       - name: Run video generator
-        run: |
-          npm run run
-        env:
-          # We'll add secrets (logins, storageState paths) later.
-          # For now, this is just the basic workflow.
+        run: npm run run
 
       - name: Upload generated videos
         uses: actions/upload-artifact@v4
