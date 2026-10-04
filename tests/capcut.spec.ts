@@ -1,4 +1,3 @@
-import { test } from '@playwright/test';
 import { shortDelay, mediumDelay, longDelay } from '../lib/humanDelays';
 
 export async function generateWithCapCut(prompt: string): Promise<string> {
@@ -17,7 +16,7 @@ export async function generateWithCapCut(prompt: string): Promise<string> {
 
     // TODO: Handle login if needed.
 
-    // 2. Enter prompt (CapCut often has a big text box for script/prompt)
+    // 2. Enter prompt
     const textarea = await page
       .locator('textarea[aria-label*="prompt"], textarea[placeholder*="prompt"], textarea:not([aria-label])')
       .first();
@@ -46,10 +45,3 @@ export async function generateWithCapCut(prompt: string): Promise<string> {
     await browser.close();
   }
 }
-
-// Manual test for later
-test('manual capcut generation', async ({ page }) => {
-  const prompt = "A cinematic shot of a man walking through a desert at sunset, warm lighting, slow motion";
-  const path = await generateWithCapCut(prompt);
-  console.log('Generated video:', path);
-});
